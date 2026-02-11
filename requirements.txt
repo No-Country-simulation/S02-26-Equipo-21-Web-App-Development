@@ -1,0 +1,13 @@
+# Dependencias para el script de conversión de video horizontal a vertical
+
+# Procesamiento de video
+opencv-python==4.9.0.80
+
+# Detección de rostros con IA
+mediapipe==0.10.9
+
+# Procesamiento numérico
+numpy==1.26.3
+
+# Sistema
+pathlib2==2.3.7.post1
