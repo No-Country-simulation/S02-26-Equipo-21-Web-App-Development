@@ -1,0 +1,12 @@
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\bin\Debug\net10.0\VideoShortsGenerator.Infrastructure.deps.json
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\bin\Debug\net10.0\VideoShortsGenerator.Infrastructure.dll
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\bin\Debug\net10.0\VideoShortsGenerator.Infrastructure.pdb
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\obj\Debug\net10.0\VideoShortsGenerator.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\obj\Debug\net10.0\VideoShortsGenerator.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\obj\Debug\net10.0\VideoShortsGenerator.Infrastructure.AssemblyInfo.cs
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\obj\Debug\net10.0\VideoShortsGenerator.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\obj\Debug\net10.0\VideoShortsGenerator.Infrastructure.sourcelink.json
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\obj\Debug\net10.0\VideoShortsGenerator.Infrastructure.dll
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\obj\Debug\net10.0\refint\VideoShortsGenerator.Infrastructure.dll
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\obj\Debug\net10.0\VideoShortsGenerator.Infrastructure.pdb
+C:\Users\administrator\S02-26-Equipo-21-Web-App-Development\Backend\VideoShortsGenerator.Infrastructure\obj\Debug\net10.0\ref\VideoShortsGenerator.Infrastructure.dll

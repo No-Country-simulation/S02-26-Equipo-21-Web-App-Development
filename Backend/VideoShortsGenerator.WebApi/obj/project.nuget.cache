@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "FhsttH/1V2U=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\administrator\\S02-26-Equipo-21-Web-App-Development\\Backend\\VideoShortsGenerator.WebApi\\VideoShortsGenerator.WebApi.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\administrator\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.1\\microsoft.aspnetcore.openapi.10.0.1.nupkg.sha512",
+    "C:\\Users\\administrator\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
