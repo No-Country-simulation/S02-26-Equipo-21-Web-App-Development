@@ -2,13 +2,10 @@
 
 namespace VideoShortsGenerator.Domain.Enums;
 
-public class VideoStatus
+public enum VideoStatus
 {
-    public VideoStatus()
-    {
-        Pending,
-		    Processing,
-		    Completed,
-		    Failed
-        }
+    Pending = 0,
+    Processing = 1,
+    Completed = 2,
+    Failed = 3
 }
