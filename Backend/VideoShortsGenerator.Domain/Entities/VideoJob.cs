@@ -1,10 +1,9 @@
-﻿using System;
-using VideoShortsGenerator.Domain.Enums;
+﻿using VideoShortsGenerator.Domain.Enums;
 using VideoShortsGenerator.Domain.Events;
 
 namespace VideoShortsGenerator.Domain.Entities;
 
-public class VideoJob
+public sealed class VideoJob
 {
     private readonly List<IDomainEvent> _domainEvents = new();
 
@@ -21,6 +20,9 @@ public class VideoJob
 
     public VideoJob(string inputPath)
     {
+        if (string.IsNullOrWhiteSpace(inputPath))
+            throw new ArgumentException("InputPath no puede estar vacío", nameof(inputPath));
+
         Id = Guid.NewGuid();
         InputPath = inputPath;
         Status = VideoStatus.Pending;
@@ -32,17 +34,19 @@ public class VideoJob
     public void MarkAsProcessing()
     {
         if (Status != VideoStatus.Pending)
-            throw new InvalidOperationException("El video debe estar en estado Pending.");
+            throw new InvalidOperationException($"No se puede iniciar el procesamiento. Estado actual: {Status}");
 
         Status = VideoStatus.Processing;
-
         AddDomainEvent(new VideoProcessingStartedEvent(Id));
     }
 
     public void MarkAsCompleted(string outputPath)
     {
         if (Status != VideoStatus.Processing)
-            throw new InvalidOperationException("El video debe estar en estado Processing.");
+            throw new InvalidOperationException($"No se puede completar. Estado actual: {Status}");
+
+        if (string.IsNullOrWhiteSpace(outputPath))
+            throw new ArgumentException("OutputPath no puede estar vacío", nameof(outputPath));
 
         Status = VideoStatus.Completed;
         OutputPath = outputPath;
@@ -53,7 +57,11 @@ public class VideoJob
 
     public void MarkAsFailed()
     {
+        if (Status != VideoStatus.Processing)
+            throw new InvalidOperationException($"No se puede marcar como fallido. Estado actual: {Status}");
+
         Status = VideoStatus.Failed;
+        CompletedAt = DateTime.UtcNow;
 
         AddDomainEvent(new VideoFailedEvent(Id));
     }

@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace VideoShortsGenerator.Domain.Events;
 
-namespace VideoShortsGenerator.Domain.Events;
-
-public class VideoCompletedEvent : IDomainEvent
+public sealed class VideoCompletedEvent : IDomainEvent
 {
     public Guid VideoId { get; }
     public string OutputPath { get; }

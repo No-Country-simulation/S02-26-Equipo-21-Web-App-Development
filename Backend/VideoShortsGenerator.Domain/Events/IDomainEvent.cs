@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VideoShortsGenerator.Domain.Events;
+﻿namespace VideoShortsGenerator.Domain.Events;
 
 public interface IDomainEvent
 {

@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace VideoShortsGenerator.Domain.Events;
 
-namespace VideoShortsGenerator.Domain.Events;
-
-public class VideoProcessingStartedEvent : IDomainEvent
+public sealed class VideoProcessingStartedEvent : IDomainEvent
 {
     public Guid VideoId { get; }
     public DateTime OccurredOn { get; }
