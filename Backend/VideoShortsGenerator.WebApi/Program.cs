@@ -1,41 +1,54 @@
+using Microsoft.EntityFrameworkCore;
+using VideoShortsGenerator.Application.Abstractions;
+using VideoShortsGenerator.Application.EventHandlers;
+using VideoShortsGenerator.Application.EventHandling;
+using VideoShortsGenerator.Application.Services;
+using VideoShortsGenerator.Domain.Repositories;
+using VideoShortsGenerator.Infrastructure.BackgroundServices;
+using VideoShortsGenerator.Infrastructure.Persistence;
+using VideoShortsGenerator.Infrastructure.Storage;
+using VideoShortsGenerator.Infrastructure.VideoProcessing;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+// Database
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+
+// Infrastructure
+builder.Services.AddScoped<IVideoRepository, VideoRepository>();
+builder.Services.AddScoped<IVideoProcessor, PythonVideoProcessor>();
+builder.Services.AddScoped<IVideoStorage, LocalVideoStorage>();
+
+// Domain Events
+builder.Services.AddScoped<IEventDispatcher, DomainEventDispatcher>();
+
+// Application Services
+builder.Services.AddScoped<VideoJobEventHandler>();
+builder.Services.AddScoped<VideoJobService>();
+builder.Services.AddScoped<VideoJobQueryService>();
+
+// Background Services
+builder.Services.AddHostedService<VideoProcessingWorker>();
+
+// API
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure HTTP pipeline
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.UseAuthorization();
+app.MapControllers();
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
