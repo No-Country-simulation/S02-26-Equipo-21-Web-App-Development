@@ -2,6 +2,12 @@
 
 public interface IVideoStorage
 {
+    Task<Stream> GetFileStreamAsync(string filePath);
+    Task<string> SaveOriginalAsync(
+    Stream videoStream,
+    string originalFileName,
+    CancellationToken cancellationToken = default);
+
     Task<string> SaveAsync(
         Stream videoStream,
         string fileName,
