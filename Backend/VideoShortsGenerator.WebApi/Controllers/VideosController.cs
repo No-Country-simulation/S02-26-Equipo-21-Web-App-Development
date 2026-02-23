@@ -9,7 +9,7 @@ public class VideosController : ControllerBase
 {
     private readonly string[] _allowedExtensions = { ".mp4", ".mov", ".avi", ".mkv" };
     private readonly string[] _allowedMimeTypes = { "video/mp4", "video/quicktime", "video/x-msvideo", "video/x-matroska" };
-    private const long _maxFileSize = 100 * 1024 * 1024; // 100 MB
+    private const long _maxFileSize = 150 * 1024 * 1024; // 150 MB
     private readonly VideoJobService _service;
     private readonly VideoJobQueryService _queryService;
 

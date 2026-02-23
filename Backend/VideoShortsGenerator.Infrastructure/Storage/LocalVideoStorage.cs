@@ -24,6 +24,11 @@ public sealed class LocalVideoStorage : IVideoStorage
         var uuidName = $"{Guid.NewGuid()}{extension}";
         var physicalPath = Path.Combine(_originalsFolder, uuidName);
 
+        if (!Directory.Exists(_originalsFolder))
+        {
+            Directory.CreateDirectory(_originalsFolder);
+        }
+
         await using var fileStream = new FileStream(physicalPath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true);
         await videoStream.CopyToAsync(fileStream, ct);
 
