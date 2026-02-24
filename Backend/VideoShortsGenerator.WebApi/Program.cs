@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using VideoShortsGenerator.Application.Abstractions;
 using VideoShortsGenerator.Application.EventHandlers;
@@ -12,10 +13,10 @@ using VideoShortsGenerator.Infrastructure.VideoProcessing;
 var builder = WebApplication.CreateBuilder(args);
 
 // Database
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+    options.UseMySQL(connectionString));
 
 // Infrastructure
 builder.Services.AddScoped<IVideoRepository, VideoRepository>();
@@ -37,6 +38,16 @@ builder.Services.AddHostedService<VideoProcessingWorker>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+//Additional settings to be able to upload files
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 150 * 1024 * 1024; // 150 MB
+});
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 150 * 1024 * 1024; // 150 MB
+});
 
 var app = builder.Build();
 

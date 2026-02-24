@@ -17,7 +17,10 @@ public sealed class DomainEventDispatcher : IEventDispatcher
         IEnumerable<IDomainEvent> events,
         CancellationToken cancellationToken = default)
     {
-        foreach (var domainEvent in events)
+        // Creamos una "instantánea" (snapshot) de los eventos actuales.
+        // Esto desconecta la iteración de la lista original de la entidad.
+        var eventsList = events.ToList();
+        foreach (var domainEvent in eventsList)
         {
             switch (domainEvent)
             {

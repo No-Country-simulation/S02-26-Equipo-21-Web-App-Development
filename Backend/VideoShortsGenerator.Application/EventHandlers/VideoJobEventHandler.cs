@@ -1,5 +1,4 @@
-﻿using VideoShortsGenerator.Application.Abstractions;
-using VideoShortsGenerator.Domain.Events;
+﻿using VideoShortsGenerator.Domain.Events;
 using VideoShortsGenerator.Domain.Repositories;
 
 namespace VideoShortsGenerator.Application.EventHandlers;
@@ -7,14 +6,11 @@ namespace VideoShortsGenerator.Application.EventHandlers;
 public sealed class VideoJobEventHandler
 {
     private readonly IVideoRepository _repository;
-    private readonly IEventDispatcher _dispatcher;
 
     public VideoJobEventHandler(
-        IVideoRepository repository,
-        IEventDispatcher dispatcher)
+        IVideoRepository repository)
     {
         _repository = repository;
-        _dispatcher = dispatcher;
     }
 
     public async Task HandleAsync(
