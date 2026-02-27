@@ -1,4 +1,5 @@
-﻿using VideoShortsGenerator.Domain.Enums;
+﻿    using System.Text.Json;
+using VideoShortsGenerator.Domain.Enums;
 using VideoShortsGenerator.Domain.Events;
 
 namespace VideoShortsGenerator.Domain.Entities;
@@ -14,11 +15,21 @@ public sealed class VideoJob
     public DateTime CreatedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
 
+    // Nuevo: JSON de parámetros arbitrarios
+    public string Params { get; private set; } = "{}";
+
+    // Nuevo: tipo de procesamiento decidido (mapeado desde Params si se provee)
+    public ProcessingType ProcessingType { get; private set; } = ProcessingType.Simple;
+
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     private VideoJob() { } // Es requerido por EF Core
 
-    public VideoJob(string inputPath)
+    // Constructor existente (mantengo compatibilidad)
+    public VideoJob(string inputPath) : this(inputPath, "{}") { }
+
+    // Nuevo constructor que acepta params JSON
+    public VideoJob(string inputPath, string paramsJson)
     {
         if (string.IsNullOrWhiteSpace(inputPath))
             throw new ArgumentException("InputPath no puede estar vacío", nameof(inputPath));
@@ -27,6 +38,37 @@ public sealed class VideoJob
         InputPath = inputPath;
         Status = VideoStatus.Pending;
         CreatedAt = DateTime.UtcNow;
+
+        Params = string.IsNullOrWhiteSpace(paramsJson) ? "{}" : paramsJson;
+
+        // Intentar extraer el tipo de procesamiento desde el JSON:
+        try
+        {
+            using var doc = JsonDocument.Parse(Params);
+            if (doc.RootElement.TryGetProperty("processType", out var p) && p.ValueKind == JsonValueKind.String)
+            {
+                var s = p.GetString()!.ToLowerInvariant();
+                ProcessingType = s switch
+                {
+                    "advanced" => ProcessingType.Advanced,
+                    _ => ProcessingType.Simple
+                };
+            }
+            else if (doc.RootElement.TryGetProperty("contentType", out var c) && c.ValueKind == JsonValueKind.String)
+            {
+                var s2 = c.GetString()!.ToLowerInvariant();
+                ProcessingType = s2 switch
+                {
+                    "advanced" => ProcessingType.Advanced,
+                    _ => ProcessingType.Simple
+                };
+            }
+        }
+        catch
+        {
+            // Ignore parse errors, dejamos valores por defecto
+            ProcessingType = ProcessingType.Simple;
+        }
 
         AddDomainEvent(new VideoCreatedEvent(Id));
     }

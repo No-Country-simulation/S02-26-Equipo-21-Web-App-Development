@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="VideoProcessing\Scripts\" />
+    <Compile Remove="VirtualEnvironments\**" />
+    <EmbeddedResource Remove="VirtualEnvironments\**" />
+    <None Remove="VirtualEnvironments\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +34,12 @@
     <Compile Update="VideoProcessing\PythonVideoProcessor.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="VideoProcessing\Scripts\*.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

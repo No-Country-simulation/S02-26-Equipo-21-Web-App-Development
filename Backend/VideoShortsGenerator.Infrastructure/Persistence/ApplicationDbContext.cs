@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VideoShortsGenerator.Domain.Entities;
+using VideoShortsGenerator.Domain.Enums;
 
 namespace VideoShortsGenerator.Infrastructure.Persistence;
 
@@ -30,6 +31,17 @@ public sealed class ApplicationDbContext : DbContext
 
             entity.Property(e => e.OutputPath)
                 .HasMaxLength(500);
+
+            // <-- Cambiado a longtext para MySQL
+            entity.Property(e => e.Params)
+                .HasColumnType("longtext")
+                .IsRequired(false);
+
+            // Mapear ProcessingType como int y usar el enum como default
+            entity.Property(e => e.ProcessingType)
+                .HasConversion<int>()
+                .IsRequired()
+                .HasDefaultValue(ProcessingType.Simple);
 
             entity.Property(e => e.Status)
                 .HasConversion<int>()

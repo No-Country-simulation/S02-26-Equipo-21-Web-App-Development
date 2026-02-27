@@ -118,7 +118,7 @@ public sealed class VideoProcessingWorker : BackgroundService
 
             _logger.LogInformation("Processing video: {InputPath}", job.InputPath);
 
-            var processedStream = await processor.ProcessAsync(job.InputPath, stoppingToken);
+            var processedStream = await processor.ProcessAsync(job.InputPath, job.ProcessingType, job.Params, stoppingToken);
 
             _logger.LogInformation("Video processed successfully for job {JobId}. Saving...", jobId);
 

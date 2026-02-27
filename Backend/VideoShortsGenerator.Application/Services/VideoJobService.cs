@@ -1,4 +1,5 @@
-﻿using VideoShortsGenerator.Application.Abstractions;
+﻿using System.Text.Json;
+using VideoShortsGenerator.Application.Abstractions;
 using VideoShortsGenerator.Domain.Entities;
 using VideoShortsGenerator.Domain.Enums;
 using VideoShortsGenerator.Domain.Repositories;
@@ -20,19 +21,24 @@ public sealed class VideoJobService
         _dispatcher = dispatcher;
         _storage = storage;
     }
-    public async Task<Guid> VideoUploadAsync(Stream stream, string fileName, CancellationToken ct)
+
+    // Modificado para aceptar paramsJson opcional
+    public async Task<Guid> VideoUploadAsync(Stream stream, string fileName, string? paramsJson, CancellationToken ct)
     {
         var extension = Path.GetExtension(fileName).ToLower();
 
         // 1. Mandamos a guardar físicamente
         string inputPath = await _storage.SaveOriginalAsync(stream, extension, ct);
-        // 2. Creamos el job en la base de datos
-        Guid id = await CreateAsync(inputPath, ct);
+
+        // 2. Creamos el job en la base de datos incluyendo paramsJson
+        Guid id = await CreateAsync(inputPath, paramsJson, ct);
         return id;
     }
 
+    // Nuevo CreateAsync que recibe params JSON
     public async Task<Guid> CreateAsync(
         string inputPath,
+        string? paramsJson,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(inputPath))
@@ -42,7 +48,7 @@ public sealed class VideoJobService
         if (!exists)
             throw new FileNotFoundException($"File not found: {inputPath}");
 
-        var job = new VideoJob(inputPath);
+        var job = new VideoJob(inputPath, paramsJson ?? "{}");
 
         await _repository.AddAsync(job, cancellationToken);
         await _repository.SaveChangesAsync(cancellationToken);
