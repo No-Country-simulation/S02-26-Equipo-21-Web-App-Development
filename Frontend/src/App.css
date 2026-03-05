@@ -1,9 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .app {
   width: 100%;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
   overflow-x: hidden;
+}
+
+.app-logo {
+  display: block;
+  margin: 0 auto;
+  max-width: 300px;
+  width: 100%;
+  height: auto;
 }
 
 .app-header {
