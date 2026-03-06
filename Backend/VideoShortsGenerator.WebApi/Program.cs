@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using VideoShortsGenerator.Application.Abstractions;
@@ -11,6 +12,9 @@ using VideoShortsGenerator.Infrastructure.Storage;
 using VideoShortsGenerator.Infrastructure.VideoProcessing;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Leer orígenes permitidos desde appsettings.json (se espera un array en "Cors:AllowedOrigins")
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
 
 // Database
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -49,6 +53,18 @@ builder.Services.Configure<FormOptions>(options =>
     options.MultipartBodyLengthLimit = 150 * 1024 * 1024; // 150 MB
 });
 
+// CORS - usar los orígenes leídos desde appsettings.json
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 // Configure HTTP pipeline
@@ -59,6 +75,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Usar CORS
+app.UseCors("AllowFrontend");
+
 app.UseAuthorization();
 app.MapControllers();
 
