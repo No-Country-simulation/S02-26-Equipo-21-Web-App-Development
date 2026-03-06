@@ -10,65 +10,45 @@ const App: React.FC = () => {
     null,
   );
   const [isLoading, setIsLoading] = useState(false);
+  const [apiOnline, setApiOnline] = useState<boolean | null>(null);
 
-  // Load videos from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem("videos");
     if (saved) {
       try {
         setVideos(JSON.parse(saved));
       } catch (err) {
-        console.error("Error loading videos from localStorage:", err);
+        console.error(err);
       }
     }
   }, []);
 
-  // Save videos to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem("videos", JSON.stringify(videos));
   }, [videos]);
+
+  // Check API health on mount
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        await videoApi.getPendingVideos();
+        setApiOnline(true);
+      } catch {
+        setApiOnline(false);
+      }
+    };
+    checkHealth();
+  }, []);
 
   const showNotification = useCallback(
     (
       message: string,
       type: "success" | "error" | "info" | "warning" = "info",
     ) => {
-      const id = `notification-${Date.now()}`;
-      setNotification({ id, type, message });
+      setNotification({ id: `notification-${Date.now()}`, type, message });
     },
     [],
   );
-
-  const handleUploadSuccess = useCallback(
-    (videoId: string) => {
-      // Add new video to the list
-      const newVideo: Video = {
-        id: videoId,
-        fileName: "Cargando...",
-        status: "Pending",
-        createdAt: new Date().toISOString(),
-      };
-
-      setVideos((prev) => [newVideo, ...prev]);
-      showNotification(
-        "✓ Video subido exitosamente. Comenzando procesamiento...",
-        "success",
-      );
-
-      // Fetch the video details immediately
-      fetchVideoDetails(videoId);
-    },
-    [showNotification],
-  );
-
-  const fetchVideoDetails = async (id: string) => {
-    try {
-      const response = await videoApi.getVideoById(id);
-      updateVideoInList(response);
-    } catch (error) {
-      console.error("Error fetching video details:", error);
-    }
-  };
 
   const updateVideoInList = (apiVideo: VideoResponse) => {
     setVideos((prev) =>
@@ -87,27 +67,46 @@ const App: React.FC = () => {
     );
   };
 
+  const handleUploadSuccess = useCallback(
+    (videoId: string) => {
+      setVideos((prev) => [
+        {
+          id: videoId,
+          fileName: "Cargando...",
+          status: "Pending",
+          createdAt: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+      showNotification(
+        "✓ Video subido exitosamente. Comenzando procesamiento...",
+        "success",
+      );
+      videoApi
+        .getVideoById(videoId)
+        .then(updateVideoInList)
+        .catch(console.error);
+    },
+    [showNotification],
+  );
+
   const handleRefreshVideo = useCallback(
     async (id: string) => {
       try {
         const response = await videoApi.getVideoById(id);
         updateVideoInList(response);
-
-        // Show status update notification if status changed
         const video = videos.find((v) => v.id === id);
         if (video && video.status !== response.status) {
-          if (response.status === "Completed") {
+          if (response.status === "Completed")
             showNotification("✓ Video procesado completamente", "success");
-          } else if (response.status === "Failed") {
+          else if (response.status === "Failed")
             showNotification("✕ Error al procesar el video", "error");
-          }
         }
       } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Error al actualizar el video";
-        showNotification(message, "error");
+        showNotification(
+          error instanceof Error ? error.message : "Error al actualizar",
+          "error",
+        );
       }
     },
     [videos, showNotification],
@@ -117,13 +116,11 @@ const App: React.FC = () => {
     setIsLoading(true);
     try {
       const response = await videoApi.getPendingVideos();
-
-      // Update or add pending videos
       setVideos((prev) => {
         const updated = [...prev];
         response.forEach((apiVideo) => {
           const index = updated.findIndex((v) => v.id === apiVideo.id);
-          const videoToUpdate: Video = {
+          const v: Video = {
             id: apiVideo.id,
             fileName: apiVideo.fileName,
             status: apiVideo.status,
@@ -131,42 +128,115 @@ const App: React.FC = () => {
             completedAt: apiVideo.completedAt,
             errorMessage: apiVideo.errorMessage,
           };
-
-          if (index >= 0) {
-            updated[index] = videoToUpdate;
-          } else {
-            updated.push(videoToUpdate);
-          }
+          if (index >= 0) updated[index] = v;
+          else updated.push(v);
         });
         return updated;
       });
-
-      if (response.length > 0) {
-        showNotification(`${response.length} video(s) encontrado(s)`, "info");
-      }
+      setApiOnline(true);
+      showNotification(
+        response.length > 0
+          ? `${response.length} video(s) encontrado(s)`
+          : "No hay videos pendientes",
+        "info",
+      );
     } catch (error) {
-      const message =
+      setApiOnline(false);
+      showNotification(
         error instanceof Error
           ? error.message
-          : "Error al cargar videos pendientes";
-      showNotification(message, "error");
+          : "Error al cargar videos pendientes",
+        "error",
+      );
     } finally {
       setIsLoading(false);
     }
   }, [showNotification]);
 
+  const totalVideos = videos.length;
+  const completedVideos = videos.filter((v) => v.status === "Completed").length;
+  const processingVideos = videos.filter(
+    (v) => v.status === "Processing" || v.status === "Pending",
+  ).length;
+
   return (
     <div className="app">
       <header className="app-header">
         <div className="header-content">
-          <h1>🎬 Video Shorts Generator</h1>
-          <p>Procesa tus videos y crea shorts automáticamente</p>
+          <img src="/logo.png" alt="ShortWave" className="app-logo" />
+
+          <div
+            className={`header-status ${apiOnline === false ? "offline" : ""}`}
+          >
+            <span className="status-dot" />
+            {apiOnline === null
+              ? "Conectando..."
+              : apiOnline
+                ? "API Online"
+                : "API Offline"}
+          </div>
+
+          <div className="header-stats">
+            <div className="stat-chip">
+              Total <strong>{totalVideos}</strong>
+            </div>
+            {processingVideos > 0 && (
+              <div
+                className="stat-chip"
+                style={{
+                  color: "#d97706",
+                  borderColor: "rgba(217,119,6,0.2)",
+                  background: "rgba(217,119,6,0.06)",
+                }}
+              >
+                En proceso{" "}
+                <strong style={{ color: "#d97706" }}>{processingVideos}</strong>
+              </div>
+            )}
+            {completedVideos > 0 && (
+              <div
+                className="stat-chip"
+                style={{
+                  color: "#059669",
+                  borderColor: "rgba(5,150,105,0.2)",
+                  background: "rgba(5,150,105,0.06)",
+                }}
+              >
+                Completados{" "}
+                <strong style={{ color: "#059669" }}>{completedVideos}</strong>
+              </div>
+            )}
+          </div>
+
+          <span className="version-badge">MVP v1.0</span>
+
           <button
             className="btn-load-pending"
             onClick={handleLoadPendingVideos}
             disabled={isLoading}
           >
-            {isLoading ? "Cargando..." : "📋 Cargar Videos Pendientes"}
+            {isLoading ? (
+              <>
+                <span className="btn-spinner" />
+                Cargando...
+              </>
+            ) : (
+              <>
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                >
+                  <polyline points="1 4 1 10 7 10" />
+                  <path d="M3.51 15a9 9 0 1 0 .49-3.5" />
+                </svg>
+                Sincronizar
+              </>
+            )}
           </button>
         </div>
       </header>
@@ -176,7 +246,6 @@ const App: React.FC = () => {
           onUploadSuccess={handleUploadSuccess}
           onError={(msg) => showNotification(msg, "error")}
         />
-
         <VideoList
           videos={videos}
           onRefresh={handleRefreshVideo}
