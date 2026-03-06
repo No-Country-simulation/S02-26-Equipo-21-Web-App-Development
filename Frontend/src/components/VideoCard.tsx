@@ -99,10 +99,10 @@ export const VideoCard: React.FC<VideoCardProps> = ({
 
       <div className="card-body">
         <div className="file-info">
-          <p className="file-name" title={video.fileName}>
-            {video.fileName.length > 40
-              ? video.fileName.substring(0, 37) + "..."
-              : video.fileName}
+          <p className="file-name" title={video.fileName ?? ""}>
+            {(video.fileName ?? "").length > 40
+              ? (video.fileName ?? "").substring(0, 37) + "..."
+              : video.fileName ?? ""}
           </p>
           <p className="created-date">Creado: {formatDate(video.createdAt)}</p>
         </div>

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'https://localhost:7200/api';
+const API_BASE_URL = (import.meta.env.VITE_API_URL as string) || 'http://localhost:5273/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -10,9 +10,6 @@ const apiClient = axios.create({
   },
 });
 
-// Disable SSL verification for development
-apiClient.defaults.httpAgent = { rejectUnauthorized: false } as any;
-apiClient.defaults.httpsAgent = { rejectUnauthorized: false } as any;
 
 export interface VideoResponse {
   id: string;
