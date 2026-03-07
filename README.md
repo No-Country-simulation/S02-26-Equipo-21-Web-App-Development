@@ -19,7 +19,7 @@ No Country · Simulación S02-26 · Equipo 21*
 
 ## Sobre el proyecto
 
-Video Shorts Generator es una plataforma que automatiza la conversión de videos horizontales (16:9) al formato vertical (9:16). El usuario sube un video, el sistema lo encola y un motor Python lo convierte a **1080×1920** con fondo negro, codificado en H.264 + AAC. Una vez procesado, puede descargarlo directamente desde la interfaz.
+Es un servicio pensado para simplificar la adaptación de videos a formato vertical, de modo que queden listos para compartirse en plataformas como Shorts o Reels. A través de una interfaz web, el usuario puede cargar un video horizontal y dejar que el sistema realice la conversión de forma automática. Una vez finalizado el proceso, el archivo resultante queda disponible para su descarga, listo para su uso en redes sociales.
 
 ## Características
 
