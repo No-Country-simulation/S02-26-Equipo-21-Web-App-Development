@@ -1,0 +1,19 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build outputs
+**/bin/
+**/obj/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+Backend/VideoShortsGenerator.WebApi/appsettings.json
+/Backend/VideoShortsGenerator.WebApi/storage
+/Backend/VideoShortsGenerator.WebApi/Videos/Outputs
+/Backend/VideoShortsGenerator.Infrastructure/Migrations
